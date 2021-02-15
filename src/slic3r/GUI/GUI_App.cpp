@@ -831,7 +831,16 @@ bool GUI_App::on_init_inner()
 
     // just checking for existence of Slic3r::data_dir is not enough : it may be an empty directory
     // supplied as argument to --datadir; in that case we should still run the wizard
-    preset_bundle->setup_directories();
+    try
+    {
+        preset_bundle->setup_directories();
+    }
+    catch (const Slic3r::RuntimeError& e)
+    {
+        show_error(nullptr, format(e.what()));
+        // TODO: Kill Slicer here? data_dir probably does not exists.
+    }
+    
 
     if (is_editor()) {
 #ifdef __WXMSW__ 
@@ -876,6 +885,8 @@ bool GUI_App::on_init_inner()
     } catch (const std::exception &ex) {
         show_error(nullptr, ex.what());
     }
+
+    show_error(nullptr, "This is test dialog");
 
 #ifdef WIN32
 #if !wxVERSION_EQUAL_OR_GREATER_THAN(3,1,3)

@@ -106,7 +106,11 @@ BundleMap BundleMap::load()
     // and then additionally from resources/profiles.
     bool is_in_resources = false;
     for (auto dir : { &vendor_dir, &rsrc_vendor_dir }) {
-        for (const auto &dir_entry : boost::filesystem::directory_iterator(*dir)) {
+        boost::system::error_code ec;
+        boost::filesystem::directory_iterator dir_it = boost::filesystem::directory_iterator(*dir, ec);
+        if (ec)
+            throw Slic3r::RuntimeError(format(_L("The system cannot find the path specified: %1%"),*dir));
+        for (const auto &dir_entry : dir_it) {
             if (Slic3r::is_ini_file(dir_entry)) {
                 std::string id = dir_entry.path().stem().string();  // stem() = filename() without the trailing ".ini" part
 
@@ -1856,7 +1860,11 @@ void ConfigWizard::priv::load_vendors()
     } else {
         // In case of legacy datadir, try to guess the preference based on the printer preset files that are present
         const auto printer_dir = fs::path(Slic3r::data_dir()) / "printer";
-        for (auto &dir_entry : boost::filesystem::directory_iterator(printer_dir))
+        boost::system::error_code ec;
+        boost::filesystem::directory_iterator dir_it = boost::filesystem::directory_iterator(printer_dir, ec);
+        if (ec)
+            throw Slic3r::RuntimeError(format(_L("The system cannot find the path specified: %1%"), printer_dir));
+        for (auto &dir_entry : dir_it)
             if (Slic3r::is_ini_file(dir_entry)) {
                 auto needle = legacy_preset_map.find(dir_entry.path().filename().string());
                 if (needle == legacy_preset_map.end()) { continue; }
@@ -2532,8 +2540,15 @@ ConfigWizard::ConfigWizard(wxWindow *parent)
     , p(new priv(this))
 {
     this->SetFont(wxGetApp().normal_font());
-
-    p->load_vendors();
+    try
+    {
+        p->load_vendors();
+    }
+    catch (const std::exception& e)
+    {
+        show_error(nullptr, GUI::format(_L("Configuration wizard has run into error.\n%1%\nPlease restart application."), e.what()));
+    }
+    
     p->custom_config.reset(DynamicPrintConfig::new_from_defaults_keys({
         "gcode_flavor", "bed_shape", "bed_custom_texture", "bed_custom_model", "nozzle_diameter", "filament_diameter", "temperature", "bed_temperature",
     }));
