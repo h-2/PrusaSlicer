@@ -121,7 +121,7 @@ public:
     }
 
     void SetText(const wxString& text)
-    {
+    {    
         set_bitmap(m_main_bitmap);
         if (!text.empty()) {
             wxBitmap bitmap(m_main_bitmap);
@@ -826,7 +826,6 @@ bool GUI_App::on_init_inner()
 #endif
         scrn->SetText(_L("Loading configuration")+ dots);
     }
-
     preset_bundle = new PresetBundle();
 
     // just checking for existence of Slic3r::data_dir is not enough : it may be an empty directory
@@ -837,10 +836,15 @@ bool GUI_App::on_init_inner()
     }
     catch (const Slic3r::RuntimeError& e)
     {
+        scrn->Close();
+        scrn = nullptr;
         show_error(nullptr, format(e.what()));
-        // TODO: Kill Slicer here? data_dir probably does not exists.
     }
-    
+    // FIXME DK delete this
+    scrn->Close();
+    scrn = nullptr;
+    show_error(nullptr, L"Test message.");
+   
 
     if (is_editor()) {
 #ifdef __WXMSW__ 
@@ -886,8 +890,6 @@ bool GUI_App::on_init_inner()
         show_error(nullptr, ex.what());
     }
 
-    show_error(nullptr, "This is test dialog");
-
 #ifdef WIN32
 #if !wxVERSION_EQUAL_OR_GREATER_THAN(3,1,3)
     register_win32_dpi_event();
@@ -899,8 +901,8 @@ bool GUI_App::on_init_inner()
     Slic3r::I18N::set_translate_callback(libslic3r_translate_callback);
 
     // application frame
-    //if (scrn && is_editor())
-    //    scrn->SetText(_L("Preparing settings tabs") + dots);
+    if (scrn && is_editor())
+        scrn->SetText(_L("Preparing settings tabs") + dots);
 
     mainframe = new MainFrame();
     // hide settings tabs after first Layout
