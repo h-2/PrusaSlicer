@@ -1476,7 +1476,7 @@ void PageTemperatures::apply_custom_config(DynamicPrintConfig &config)
 // Index
 
 ConfigWizardIndex::ConfigWizardIndex(wxWindow *parent)
-    : wxPanel(parent)
+    : wxScrolled(parent)
     , bg(ScalableBitmap(parent, "PrusaSlicer_192px_transparent.png", 192))
     , bullet_black(ScalableBitmap(parent, "bullet_black.png"))
     , bullet_blue(ScalableBitmap(parent, "bullet_blue.png"))
@@ -1501,6 +1501,7 @@ ConfigWizardIndex::ConfigWizardIndex(wxWindow *parent)
     sizer->AddStretchSpacer();
     sizer->Add(logo);
     SetSizer(sizer);
+    logo_height = logo->GetBitmap().GetHeight();
 
     Bind(wxEVT_PAINT, &ConfigWizardIndex::on_paint, this);
     Bind(wxEVT_MOTION, &ConfigWizardIndex::on_mouse_move, this);
@@ -1617,15 +1618,15 @@ void ConfigWizardIndex::on_paint(wxPaintEvent & evt)
 {
     const auto size = GetClientSize();
     if (size.GetHeight() == 0 || size.GetWidth() == 0) { return; }
-
+   
     wxPaintDC dc(this);
-
+    
     const auto bullet_w = bullet_black.bmp().GetSize().GetWidth();
     const auto bullet_h = bullet_black.bmp().GetSize().GetHeight();
     const int yoff_icon = bullet_h < em_h ? (em_h - bullet_h) / 2 : 0;
     const int yoff_text = bullet_h > em_h ? (bullet_h - em_h) / 2 : 0;
     const int yinc = item_height();
-
+   
     int index_width = 0;
 
     unsigned y = 0;
@@ -1653,6 +1654,11 @@ void ConfigWizardIndex::on_paint(wxPaintEvent & evt)
             Refresh();
         });
     }
+
+    if (y + logo_height > size.GetHeight())
+        logo->Hide();
+    else
+        logo->Show();
 }
 
 void ConfigWizardIndex::on_mouse_move(wxMouseEvent &evt)
@@ -2543,7 +2549,13 @@ ConfigWizard::ConfigWizard(wxWindow *parent)
     p->hscroll_sizer = new wxBoxSizer(wxHORIZONTAL);
     p->hscroll->SetSizer(p->hscroll_sizer);
 
-    topsizer->Add(p->index, 0, wxEXPAND);
+    auto *box    = new wxBoxSizer(wxHORIZONTAL);
+    auto *scroll = new wxScrolledWindow(this);
+    box->Add(p->index, 0, wxEXPAND);
+    scroll->SetSizer(box);
+    topsizer->Add(scroll, 0, wxEXPAND);
+
+    //topsizer->Add(p->index, 0, wxEXPAND);
     topsizer->AddSpacer(INDEX_MARGIN);
     topsizer->Add(p->hscroll, 1, wxEXPAND);
 

@@ -472,7 +472,7 @@ typedef std::map<std::string /* = vendor ID */,
                            PagePrinters* /* = SLA page */>> Pages3rdparty;
 
 
-class ConfigWizardIndex: public wxPanel
+class ConfigWizardIndex: public /*wxPanel*/wxScrolled<wxPanel>
 {
 public:
     ConfigWizardIndex(wxWindow *parent);
@@ -517,6 +517,8 @@ private:
     size_t item_active;
     ssize_t item_hover;
     size_t last_page;
+
+    int logo_height;
 
     int item_height() const { return std::max(bullet_black.bmp().GetSize().GetHeight(), em_w) + em_w; }
 
