@@ -31,6 +31,7 @@
 #include "GUI.hpp"
 #include "GUI_App.hpp"
 #include "GUI_Utils.hpp"
+#include "format.hpp"
 #include "GUI_ObjectManipulation.hpp"
 #include "slic3r/Config/Snapshot.hpp"
 #include "slic3r/Utils/PresetUpdater.hpp"
@@ -1480,7 +1481,7 @@ void PageTemperatures::apply_custom_config(DynamicPrintConfig &config)
 // Index
 
 ConfigWizardIndex::ConfigWizardIndex(wxWindow *parent)
-    : wxPanel(parent)
+    : wxPanel(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL)
     , bg(ScalableBitmap(parent, "PrusaSlicer_192px_transparent.png", 192))
     , bullet_black(ScalableBitmap(parent, "bullet_black.png"))
     , bullet_blue(ScalableBitmap(parent, "bullet_blue.png"))
@@ -1650,7 +1651,7 @@ void ConfigWizardIndex::on_paint(wxPaintEvent & evt)
         y += yinc;
         index_width = std::max(index_width, (int)x + text_size.x);
     }
-
+    
     if (GetMinSize().x < index_width) {
         CallAfter([this, index_width]() {
             SetMinSize(wxSize(index_width, GetMinSize().y));
@@ -2565,6 +2566,7 @@ ConfigWizard::ConfigWizard(wxWindow *parent)
     p->hscroll = new wxScrolledWindow(this);
     p->hscroll_sizer = new wxBoxSizer(wxHORIZONTAL);
     p->hscroll->SetSizer(p->hscroll_sizer);
+
 
     topsizer->Add(p->index, 0, wxEXPAND);
     topsizer->AddSpacer(INDEX_MARGIN);
