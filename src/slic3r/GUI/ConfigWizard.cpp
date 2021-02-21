@@ -1655,7 +1655,7 @@ void ConfigWizardIndex::on_paint(wxPaintEvent & evt)
         });
     }
 
-    if (y + logo_height > size.GetHeight())
+    if ((int)y + logo_height > size.GetHeight())
         logo->Hide();
     else
         logo->Show();
