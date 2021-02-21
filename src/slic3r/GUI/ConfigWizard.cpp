@@ -1476,7 +1476,7 @@ void PageTemperatures::apply_custom_config(DynamicPrintConfig &config)
 // Index
 
 ConfigWizardIndex::ConfigWizardIndex(wxWindow *parent)
-    : wxScrolled(parent)
+    : wxPanel(parent)
     , bg(ScalableBitmap(parent, "PrusaSlicer_192px_transparent.png", 192))
     , bullet_black(ScalableBitmap(parent, "bullet_black.png"))
     , bullet_blue(ScalableBitmap(parent, "bullet_blue.png"))
@@ -2549,13 +2549,7 @@ ConfigWizard::ConfigWizard(wxWindow *parent)
     p->hscroll_sizer = new wxBoxSizer(wxHORIZONTAL);
     p->hscroll->SetSizer(p->hscroll_sizer);
 
-    auto *box    = new wxBoxSizer(wxHORIZONTAL);
-    auto *scroll = new wxScrolledWindow(this);
-    box->Add(p->index, 0, wxEXPAND);
-    scroll->SetSizer(box);
-    topsizer->Add(scroll, 0, wxEXPAND);
-
-    //topsizer->Add(p->index, 0, wxEXPAND);
+    topsizer->Add(p->index, 0, wxEXPAND);
     topsizer->AddSpacer(INDEX_MARGIN);
     topsizer->Add(p->hscroll, 1, wxEXPAND);
 
